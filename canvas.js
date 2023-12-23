@@ -17,13 +17,19 @@ const pixelsPerSecond = canvas.width / totalTime;
 let isAnimating = false;
 let wasPlayingBeforeDrag = false;
 let currentTimeInSeconds = 600; // Starting at 00:10:00
-let markerTimeInSeconds = 1800; // Example: Marker at 00:30:00
 let indicatorHeight = 40; // Adjusted indicator height
 let animationSpeed = 1; // Default speed (1 second per frame)
 
 // Variables for dragging indicator
 let isDragging = false;
 let dragStartX = 0;
+
+// Array of point of interest markers
+const pointOfInterestMarkers = [
+  { title: 'Fire', time: 1800, color: '#FF5733' },  // Example: Marker at 00:30:00
+  { title: 'Humidity', time: 7200, color: '#cd0cca' }   // Example: Marker at 02:00:00
+  // Add more markers as needed
+];
 
 // Function to draw the timeline
 function drawTimeline() {
@@ -45,8 +51,8 @@ function drawTimeline() {
   // Draw time labels
   drawTimeLabels(3600, 40);
 
-  // Draw marker on the timeline
-  drawMarker(markerTimeInSeconds);
+  // Draw markers on the timeline
+  drawMarkers(pointOfInterestMarkers);
 
   // Draw timeline indicator with time at the bottom
   const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
@@ -57,6 +63,24 @@ function drawTimeline() {
     requestAnimationFrame(drawTimeline);
     updateTimeline();
   }
+}
+
+// Function to draw markers on the timeline
+function drawMarkers(markers) {
+  markers.forEach(marker => {
+    const markerX = (marker.time / totalTime) * canvas.width;
+    const markerY = 10; // Adjust the Y position above the graduation steps
+
+    ctx.fillStyle = marker.color;
+    ctx.beginPath();
+    ctx.arc(markerX, markerY, 5, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Draw title next to the marker
+    ctx.fillStyle = marker.color;
+    ctx.textAlign = 'center';
+    ctx.fillText(marker.title, markerX, markerY + 45);
+  });
 }
 
 // Function to draw a custom-shaped indicator
@@ -87,18 +111,6 @@ function drawCustomIndicator(x) {
   ctx.fillStyle = '#000';
   ctx.textAlign = 'center';
   ctx.fillText(currentTimeFormatted, x, 20 + indicatorHeight + 15);
-}
-
-// Function to draw a smaller marker
-function drawMarker(timeInSeconds) {
-  const markerX = (timeInSeconds / totalTime) * canvas.width;
-  const markerY = 10; // Adjust the Y position above the graduation steps
-  const markerColor = '#ea4335';
-
-  ctx.fillStyle = markerColor;
-  ctx.beginPath();
-  ctx.arc(markerX, markerY, 5, 0, 2 * Math.PI);
-  ctx.fill();
 }
 
 // Function to draw ruler graduation steps
@@ -215,6 +227,8 @@ window.addEventListener('resize', () => {
 canvas.addEventListener('mousedown', handleMouseDown);
 canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mouseenter', handleMouseEnter);
+canvas.addEventListener('mouseleave', handleMouseLeave);
 
 function handleMouseEnter(event) {
   const mouseX = event.clientX;
