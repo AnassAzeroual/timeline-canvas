@@ -7,7 +7,7 @@ const normalSpeedButton = document.getElementById('normalSpeedButton');
 
 // Set canvas dimensions
 canvas.width = window.innerWidth;
-canvas.height = 120; // Adjusted height to accommodate the ruler
+canvas.height = 80; // Adjusted height to accommodate the ruler
 
 // Timeline data
 const totalTime = 23 * 60 * 60; // Total seconds in a day
