@@ -106,8 +106,8 @@ function drawCustomIndicator(x) {
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
 
-  // Draw time at the bottom
-  const currentTimeFormatted = formatTime(currentTimeInSeconds);
+  // Draw time at the bottom in hh:mm:ss format
+  const currentTimeFormatted = formatTime(currentTimeInSeconds, true);
   ctx.fillStyle = '#000';
   ctx.textAlign = 'center';
   ctx.fillText(currentTimeFormatted, x, 20 + indicatorHeight + 15);
@@ -139,9 +139,11 @@ function drawTimeLabels(interval, y) {
   ctx.font = '12px Arial';
   for (let i = 0; i <= totalTime; i += interval) {
     const x = (i / totalTime) * canvas.width;
-    ctx.fillText(formatTime(i), x, y);
+    const formattedTime = formatTime(i);
+    ctx.fillText(formattedTime, x, y);
   }
 }
+
 
 // Function to update timeline state
 function updateTimeline() {
@@ -158,12 +160,20 @@ function updateTimeline() {
 }
 
 // Function to format time in HH:mm:ss format
-function formatTime(seconds) {
+function formatTime(seconds, isIndicator = false) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
+
   const remainingSeconds = Math.floor(seconds % 60);
-  return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
+  if (isIndicator) {
+    return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
+  } else if (canvas.width < 1200) {
+    return `${padZero(hours)}:${padZero(minutes)}`;
+  }else {
+    return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
+  }
 }
+
 
 // Function to pad zeros
 function padZero(num) {
