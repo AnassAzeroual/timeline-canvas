@@ -69,8 +69,8 @@ function drawCustomIndicator(x) {
   ctx.shadowColor = shadowColor;
   ctx.shadowBlur = shadowBlur;
 
-  // Draw indicator shape
-  ctx.fillStyle = indicatorColor;
+  // Draw indicator shape with background color change on hover
+  ctx.fillStyle = isHoveringIndicator ? 'red' : indicatorColor;
   ctx.beginPath();
   ctx.moveTo(x, 20);
   ctx.lineTo(x, 20 + indicatorHeight);
@@ -159,6 +159,7 @@ function padZero(num) {
 }
 
 let lastTimestamp;
+let isHoveringIndicator = false;
 
 // Start button click event
 startButton.addEventListener('click', () => {
@@ -188,7 +189,7 @@ fastForwardButton.addEventListener('click', () => {
 
 // Slow forward button click event
 slowForwardButton.addEventListener('click', () => {
-  animationSpeed = 0.5; // Change speed to slow forward (0.5 second per frame)
+  animationSpeed = 0.5; // Change speed to slow forward (0.5 seconds per frame)
   if (isAnimating) {
     lastTimestamp = new Date();
     requestAnimationFrame(drawTimeline);
@@ -224,13 +225,16 @@ function handleMouseEnter(event) {
   const indicatorY = 20;
   const indicatorBottomY = indicatorY + indicatorHeight;
   if (mouseX >= indicatorX - 5 && mouseX <= indicatorX + 5 && mouseY >= indicatorY && mouseY <= indicatorBottomY) {
+    isHoveringIndicator = true;
     canvas.style.cursor = 'pointer';
   } else {
+    isHoveringIndicator = false;
     canvas.style.cursor = 'default';
   }
 }
 
 function handleMouseLeave() {
+  isHoveringIndicator = false;
   canvas.style.cursor = 'default';
 }
 
