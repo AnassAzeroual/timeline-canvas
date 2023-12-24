@@ -194,6 +194,18 @@ function padZero(num) {
   return num < 10 ? `0${num}` : num;
 }
 
+// Function to select a time when clicking on the timeline
+function selectTime(event) {
+  const mouseX = event.clientX;
+
+  // Calculate the clicked time based on the mouse position
+  const selectedTimeInSeconds = (mouseX / canvas.width) * totalTime;
+
+  // Update the current time and redraw the timeline
+  currentTimeInSeconds = selectedTimeInSeconds;
+  drawTimeline();
+}
+
 let lastTimestamp;
 let isHoveringIndicator = false;
 
@@ -253,6 +265,8 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseenter', handleMouseEnter);
 canvas.addEventListener('mouseleave', handleMouseLeave);
+// Event listener for selecting a time when clicking on the timeline
+canvas.addEventListener('click', selectTime);
 
 function handleMouseEnter(event) {
   const mouseX = event.clientX;
