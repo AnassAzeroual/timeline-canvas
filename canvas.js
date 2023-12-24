@@ -36,13 +36,13 @@ function drawTimeline() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw ruler graduation steps for hours
-  drawGraduationSteps(3600, '|', 12, '#4285f4', 12);
+  drawGraduationStepsHours(3600, '|', 16, '#ce1b24', 18);
 
   // Draw larger vertical bars for every 30 minutes of every hour
-  drawVerticalBars(1800, 8, '#34a853');
+  drawGraduationStepsHalfHours(1800, 10, '#34a853');
 
   // Draw smaller graduation steps for minutes
-  drawGraduationSteps(300, '|', 18, '#fbbc05', 8);
+  drawGraduationStepsMinutes(300, '|', 18, '#fbbc05', 8);
 
   // Draw timeline background
   ctx.fillStyle = '#f0f0f0';
@@ -114,26 +114,40 @@ function drawCustomIndicator(x) {
 }
 
 // Function to draw ruler graduation steps
-function drawGraduationSteps(interval, symbol, y, color, fontSize) {
+function drawGraduationStepsHours(interval, symbol, y, color, fontSize) {
   ctx.fillStyle = color;
   ctx.font = `${fontSize}px Arial`;
   for (let i = 0; i <= totalTime; i += interval) {
-    const x = (i / totalTime) * canvas.width;
-    ctx.fillText(symbol, x, y);
+      const x = (i / totalTime) * canvas.width;
+      ctx.fillText(symbol, x, y);
+  }
+}
+
+// Function to draw ruler graduation steps
+function drawGraduationStepsMinutes(interval, symbol, y, color, fontSize) {
+  ctx.fillStyle = color;
+  ctx.font = `${fontSize}px Arial`;
+  for (let i = 0; i <= totalTime; i += interval) {
+    if (i%1800 !== 0) {
+      const x = (i / totalTime) * canvas.width;
+      ctx.fillText(symbol, x, y);
+    }
   }
 }
 
 // Function to draw larger vertical bars
-function drawVerticalBars(interval, height, color) {
+function drawGraduationStepsHalfHours(interval, height, color) {
   ctx.fillStyle = color;
   ctx.font = '8px Arial';
   for (let i = 0; i <= totalTime; i += interval) {
-    const x = (i / totalTime) * canvas.width;
-    ctx.fillRect(x - 1, 12, 2, height);
+    if (i%3600) {
+      const x = (i / totalTime) * canvas.width;
+      ctx.fillRect(x - 1, 10, 3, height);
+    }
   }
 }
 
-// Function to draw smaller graduation steps for minutes
+// Function to draw time labels in timeline
 function drawTimeLabels(interval, y) {
   ctx.fillStyle = '#333';
   ctx.font = '12px Arial';
