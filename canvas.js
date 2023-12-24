@@ -1,32 +1,36 @@
+// Timeline Canvas and Context
 const canvas = document.getElementById('timeline');
 const ctx = canvas.getContext('2d');
+
+// Control Buttons
 const startButton = document.getElementById('startButton');
 const fastForwardButton = document.getElementById('fastForwardButton');
 const slowForwardButton = document.getElementById('slowForwardButton');
 const normalSpeedButton = document.getElementById('normalSpeedButton');
+
+// Timeline Configuration
 let isShowingPreviewLine = false;
 let previewLineX = 0;
 
-// Set canvas dimensions
 canvas.width = window.innerWidth;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
-// Timeline data
-const totalTime = (24 * 60 * 60); // Total seconds in a day
+const totalTime = 24 * 60 * 60; // Total seconds in a day
 const pixelsPerSecond = canvas.width / totalTime;
 
-// Variables to track animation state and speed
+// Animation State and Speed
 let isAnimating = false;
 let wasPlayingBeforeDrag = false;
 let currentTimeInSeconds = 600; // Starting at 00:10:00
 let indicatorHeight = 40; // Adjusted indicator height
 let animationSpeed = 1; // Default speed (1 second per frame)
 
-// Variables for dragging indicator
+// Dragging Indicator Variables
 let isDragging = false;
 let dragStartX = 0;
+let isHoveringIndicator = false;
 
-// Array of point of interest markers
+// Array of Point of Interest Markers
 const pointOfInterestMarkers = [
   { title: 'Fire', time: 1800, color: '#FF5733' },  // Example: Marker at 00:30:00
   { title: 'Humidity', time: 7200, color: '#cd0cca' }   // Example: Marker at 02:00:00
@@ -60,8 +64,8 @@ function drawTimeline() {
   const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
   drawCustomIndicator(indicatorX);
 
-   // Draw the preview line when hovering over the timeline
-   drawPreviewLine();
+  // Draw the preview line when hovering over the timeline
+  drawPreviewLine();
 
   // Continue animation if it's running
   if (isAnimating && !isDragging) {
@@ -124,7 +128,7 @@ function drawGraduationStepsHours(interval, symbol, y, color, fontSize) {
   ctx.font = `${fontSize}px Arial`;
   for (let i = 0; i <= totalTime; i += interval) {
     const x = (i / totalTime) * canvas.width;
-      ctx.fillText(symbol, x - 2, y);
+    ctx.fillText(symbol, x - 2, y);
   }
 }
 
@@ -133,7 +137,7 @@ function drawGraduationStepsMinutes(interval, symbol, y, color, fontSize) {
   ctx.fillStyle = color;
   ctx.font = `${fontSize}px Arial`;
   for (let i = 0; i <= totalTime; i += interval) {
-    if (i%1800 !== 0) {
+    if (i % 1800 !== 0) {
       const x = (i / totalTime) * canvas.width;
       ctx.fillText(symbol, x, y);
     }
@@ -145,7 +149,7 @@ function drawGraduationStepsHalfHours(interval, height, color) {
   ctx.fillStyle = color;
   ctx.font = '8px Arial';
   for (let i = 0; i <= totalTime; i += interval) {
-    if (i%3600) {
+    if (i % 3600) {
       const x = (i / totalTime) * canvas.width;
       ctx.fillRect(x - 1, 10, 3, height);
     }
@@ -162,7 +166,6 @@ function drawTimeLabels(interval, y) {
     ctx.fillText(formattedTime, x, y);
   }
 }
-
 
 // Function to update timeline state
 function updateTimeline() {
@@ -182,17 +185,16 @@ function updateTimeline() {
 function formatTime(seconds, isIndicator = false) {
   const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-
   const remainingSeconds = Math.floor(seconds % 60);
+
   if (isIndicator) {
     return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
   } else if (canvas.width < 1200) {
     return `${padZero(hours)}:${padZero(minutes)}`;
-  }else {
+  } else {
     return `${padZero(hours)}:${padZero(minutes)}:${padZero(remainingSeconds)}`;
   }
 }
-
 
 // Function to pad zeros
 function padZero(num) {
@@ -211,6 +213,7 @@ function selectTime(event) {
   drawTimeline();
 }
 
+// Function to show time preview when hovering over the timeline
 function showTimePreview(event) {
   const mouseX = event.clientX;
 
@@ -227,7 +230,7 @@ function showTimePreview(event) {
   drawTimeline();
 }
 
-
+// Function to draw the preview line
 function drawPreviewLine() {
   if (isShowingPreviewLine) {
     // Draw the red vertical line
@@ -247,13 +250,13 @@ function drawPreviewLine() {
   }
 }
 
+// Function to hide the time preview when leaving the timeline
 function hideTimePreview() {
   isShowingPreviewLine = false;
   drawTimeline();
 }
 
-let lastTimestamp;
-let isHoveringIndicator = false;
+// Event listeners
 
 // Start button click event
 startButton.addEventListener('click', () => {
@@ -311,11 +314,15 @@ canvas.addEventListener('mousemove', handleMouseMove);
 canvas.addEventListener('mouseup', handleMouseUp);
 canvas.addEventListener('mouseenter', handleMouseEnter);
 canvas.addEventListener('mouseleave', handleMouseLeave);
+
 // Event listener for selecting a time when clicking on the timeline
 canvas.addEventListener('click', selectTime);
+
+// Event listeners for time preview
 canvas.addEventListener('mousemove', showTimePreview);
 canvas.addEventListener('mouseleave', hideTimePreview);
 
+// Function to handle mouse enter for the timeline indicator
 function handleMouseEnter(event) {
   const mouseX = event.clientX;
   const mouseY = event.clientY;
@@ -324,6 +331,7 @@ function handleMouseEnter(event) {
   const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
   const indicatorY = 20;
   const indicatorBottomY = indicatorY + indicatorHeight;
+
   if (mouseX >= indicatorX - 5 && mouseX <= indicatorX + 5 && mouseY >= indicatorY && mouseY <= indicatorBottomY) {
     isHoveringIndicator = true;
     canvas.style.cursor = 'pointer';
@@ -333,11 +341,13 @@ function handleMouseEnter(event) {
   }
 }
 
+// Function to handle mouse leave for the timeline indicator
 function handleMouseLeave() {
   isHoveringIndicator = false;
   canvas.style.cursor = 'default';
 }
 
+// Function to handle mouse down for dragging the timeline indicator
 function handleMouseDown(event) {
   const mouseX = event.clientX;
   const mouseY = event.clientY;
@@ -346,6 +356,7 @@ function handleMouseDown(event) {
   const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
   const indicatorY = 20;
   const indicatorBottomY = indicatorY + indicatorHeight;
+
   if (mouseX >= indicatorX - 5 && mouseX <= indicatorX + 5 && mouseY >= indicatorY && mouseY <= indicatorBottomY) {
     isDragging = true;
     dragStartX = event.clientX;
@@ -356,6 +367,7 @@ function handleMouseDown(event) {
   }
 }
 
+// Function to handle mouse move for dragging the timeline indicator
 function handleMouseMove(event) {
   handleMouseEnter(event);
 
@@ -376,6 +388,7 @@ function handleMouseMove(event) {
   }
 }
 
+// Function to handle mouse up for dragging the timeline indicator
 function handleMouseUp() {
   isDragging = false;
   if (wasPlayingBeforeDrag) {
@@ -386,5 +399,5 @@ function handleMouseUp() {
 }
 
 // Initial draw
-lastTimestamp = new Date();
+let lastTimestamp = new Date();
 drawTimeline();
