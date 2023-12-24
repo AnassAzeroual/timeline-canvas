@@ -4,6 +4,8 @@ const startButton = document.getElementById('startButton');
 const fastForwardButton = document.getElementById('fastForwardButton');
 const slowForwardButton = document.getElementById('slowForwardButton');
 const normalSpeedButton = document.getElementById('normalSpeedButton');
+let isShowingPreviewLine = false;
+let previewLineX = 0;
 
 // Set canvas dimensions
 canvas.width = window.innerWidth;
@@ -57,6 +59,9 @@ function drawTimeline() {
   // Draw timeline indicator with time at the bottom
   const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
   drawCustomIndicator(indicatorX);
+
+   // Draw the preview line when hovering over the timeline
+   drawPreviewLine();
 
   // Continue animation if it's running
   if (isAnimating && !isDragging) {
@@ -206,6 +211,47 @@ function selectTime(event) {
   drawTimeline();
 }
 
+function showTimePreview(event) {
+  const mouseX = event.clientX;
+
+  // Calculate the previewed time and line position based on the mouse position
+  const previewedTimeInSeconds = (mouseX / canvas.width) * totalTime;
+  previewLineX = mouseX;
+  isShowingPreviewLine = true;
+
+  // Display the previewed time in a tooltip or any other UI element
+  // For simplicity, let's log it to the console
+  console.log("Previewed Time: " + formatTime(previewedTimeInSeconds));
+
+  // Redraw the timeline to update the preview line
+  drawTimeline();
+}
+
+
+function drawPreviewLine() {
+  if (isShowingPreviewLine) {
+    // Draw the red vertical line
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(previewLineX, 20);
+    ctx.lineTo(previewLineX, canvas.height);
+    ctx.stroke();
+
+    // Draw the time below the line
+    const previewedTimeInSeconds = (previewLineX / canvas.width) * totalTime;
+    const previewedTimeFormatted = formatTime(previewedTimeInSeconds);
+    ctx.fillStyle = 'red';
+    ctx.textAlign = 'start';
+    ctx.fillText(previewedTimeFormatted, previewLineX, canvas.height - 5);
+  }
+}
+
+function hideTimePreview() {
+  isShowingPreviewLine = false;
+  drawTimeline();
+}
+
 let lastTimestamp;
 let isHoveringIndicator = false;
 
@@ -267,6 +313,8 @@ canvas.addEventListener('mouseenter', handleMouseEnter);
 canvas.addEventListener('mouseleave', handleMouseLeave);
 // Event listener for selecting a time when clicking on the timeline
 canvas.addEventListener('click', selectTime);
+canvas.addEventListener('mousemove', showTimePreview);
+canvas.addEventListener('mouseleave', hideTimePreview);
 
 function handleMouseEnter(event) {
   const mouseX = event.clientX;
