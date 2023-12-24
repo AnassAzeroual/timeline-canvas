@@ -10,7 +10,7 @@ canvas.width = window.innerWidth;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
 // Timeline data
-const totalTime = 23 * 60 * 60; // Total seconds in a day
+const totalTime = (24 * 60 * 60); // Total seconds in a day
 const pixelsPerSecond = canvas.width / totalTime;
 
 // Variables to track animation state and speed
@@ -36,7 +36,7 @@ function drawTimeline() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw ruler graduation steps for hours
-  drawGraduationStepsHours(3600, '|', 16, '#ce1b24', 18);
+  drawGraduationStepsHours(3600, '|', 18, '#ce1b24', 16);
 
   // Draw larger vertical bars for every 30 minutes of every hour
   drawGraduationStepsHalfHours(1800, 10, '#34a853');
@@ -109,7 +109,7 @@ function drawCustomIndicator(x) {
   // Draw time at the bottom in hh:mm:ss format
   const currentTimeFormatted = formatTime(currentTimeInSeconds, true);
   ctx.fillStyle = '#000';
-  ctx.textAlign = 'center';
+  ctx.textAlign = 'start';
   ctx.fillText(currentTimeFormatted, x, 20 + indicatorHeight + 15);
 }
 
@@ -118,8 +118,8 @@ function drawGraduationStepsHours(interval, symbol, y, color, fontSize) {
   ctx.fillStyle = color;
   ctx.font = `${fontSize}px Arial`;
   for (let i = 0; i <= totalTime; i += interval) {
-      const x = (i / totalTime) * canvas.width;
-      ctx.fillText(symbol, x, y);
+    const x = (i / totalTime) * canvas.width;
+      ctx.fillText(symbol, x - 2, y);
   }
 }
 
