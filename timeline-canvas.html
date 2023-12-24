@@ -24,8 +24,15 @@
 
 <body>
 
+  <!-- Add this video element to your HTML -->
+<video id="myVideo" width="640" height="360" controls>
+  <source src="myVideo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
   <canvas id="timeline"></canvas>
   <button id="startButton">Start</button>
+  <button id="stopButton">Stop</button>
   <button id="fastForwardButton">Fast Forward</button>
   <button id="slowForwardButton">Slow Forward</button>
   <button id="normalSpeedButton">Normal Speed</button>

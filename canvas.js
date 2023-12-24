@@ -3,10 +3,12 @@ const canvas = document.getElementById('timeline');
 const ctx = canvas.getContext('2d');
 
 // Control Buttons
+const stopButton = document.getElementById('stopButton');
 const startButton = document.getElementById('startButton');
 const fastForwardButton = document.getElementById('fastForwardButton');
 const slowForwardButton = document.getElementById('slowForwardButton');
 const normalSpeedButton = document.getElementById('normalSpeedButton');
+const video = document.getElementById('myVideo');
 
 // Timeline Configuration
 let isShowingPreviewLine = false;
@@ -15,7 +17,14 @@ let previewLineX = 0;
 canvas.width = window.innerWidth;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
-const totalTime = 24 * 60 * 60; // Total seconds in a day
+// Set initial timeline duration based on the video duration after metadata is loaded
+let totalTime = NaN;
+
+// Event listener for video metadata loaded event
+video.addEventListener('loadedmetadata', () => {
+  totalTime = Math.ceil(video.duration); // Round up to the nearest second
+  console.log(totalTime); // Check the total time
+});
 const pixelsPerSecond = canvas.width / totalTime;
 
 // Animation State and Speed
@@ -176,6 +185,7 @@ function updateTimeline() {
 
   if (currentTimeInSeconds >= totalTime) {
     currentTimeInSeconds = 0; // Reset the counter when it reaches 23:59:59
+    stopButton.click(); // Stop the video and reset the timeline when it completes
   }
 
   lastTimestamp = now;
@@ -257,6 +267,25 @@ function hideTimePreview() {
 }
 
 // Event listeners
+
+// Event listener for start button click event
+startButton.addEventListener('click', () => {
+  if (!isAnimating) {
+    isAnimating = true;
+    lastTimestamp = new Date();
+    drawTimeline();
+    video.play(); // Start the video when the timeline starts
+  }
+});
+
+// Event listener for stop button click event
+stopButton.addEventListener('click', () => {
+  isAnimating = false; // Stop the animation
+  video.pause(); // Pause the video when the timeline stops
+  video.currentTime = 0; // Reset video to the beginning
+  currentTimeInSeconds = 0; // Reset the timeline to the beginning
+  drawTimeline(); // Redraw the timeline at the beginning
+});
 
 // Start button click event
 startButton.addEventListener('click', () => {
