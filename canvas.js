@@ -18,19 +18,20 @@ canvas.width = window.innerWidth;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
 // Set initial timeline duration based on the video duration after metadata is loaded
-let totalTime = NaN;
+let totalTime = 60 * 60 * 24;
 
 // Event listener for video metadata loaded event
 video.addEventListener('loadedmetadata', () => {
-  totalTime = Math.ceil(video.duration); // Round up to the nearest second
-  console.log(totalTime); // Check the total time
+  // totalTime = Math.ceil(video.duration); // Round up to the nearest second
+  console.log(video.duration); // Check the total time
+  drawTimeline();
 });
 const pixelsPerSecond = canvas.width / totalTime;
 
 // Animation State and Speed
 let isAnimating = false;
 let wasPlayingBeforeDrag = false;
-let currentTimeInSeconds = 600; // Starting at 00:10:00
+let currentTimeInSeconds = 0; // Starting at 00:00:00
 let indicatorHeight = 40; // Adjusted indicator height
 let animationSpeed = 1; // Default speed (1 second per frame)
 
@@ -46,9 +47,34 @@ const pointOfInterestMarkers = [
   // Add more markers as needed
 ];
 
+// Draw horizontal line based on video duration
+function drawVideoDurationLine() {
+  const lineY = canvas.height / 1.2; // Adjust the Y position of the line
+  const videoLineX = (video.duration / totalTime) * canvas.width;
+
+  // Create a gradient for the line
+  const gradient = ctx.createLinearGradient(0, 0, videoLineX, 0);
+  gradient.addColorStop(0, '#3498db'); // Start color
+  gradient.addColorStop(1, '#2ecc71'); // End color
+
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round'; // Add rounded line caps for a modern look
+  ctx.strokeStyle = gradient; // Use the gradient for the line color
+
+  // Draw the line
+  ctx.beginPath();
+  ctx.moveTo(0, lineY);
+  ctx.lineTo(videoLineX, lineY);
+  ctx.stroke();
+}
+
 // Function to draw the timeline
 function drawTimeline() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Increase the timeline height to accommodate the horizontal line
+  const timelineHeight = 110;
+  canvas.height = timelineHeight;
 
   // Draw ruler graduation steps for hours
   drawGraduationStepsHours(3600, '|', 18, '#ce1b24', 16);
@@ -61,7 +87,10 @@ function drawTimeline() {
 
   // Draw timeline background
   ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(0, 20, canvas.width, canvas.height - 20);
+  ctx.fillRect(0, 20, canvas.width, timelineHeight - 20);
+
+  // Draw horizontal line based on video duration
+  drawVideoDurationLine();
 
   // Draw time labels
   drawTimeLabels(3600, 40);
@@ -113,7 +142,7 @@ function drawCustomIndicator(x) {
 
   // Draw indicator shape with background color change on hover
   ctx.fillStyle = isHoveringIndicator ? 'red' : indicatorColor;
-  ctx.beginPath();
+    ctx.beginPath();
   ctx.moveTo(x, 20);
   ctx.lineTo(x, 20 + indicatorHeight);
   ctx.arc(x, 20 + indicatorHeight, 5, 0, Math.PI * 2);
@@ -135,7 +164,7 @@ function drawCustomIndicator(x) {
 function drawGraduationStepsHours(interval, symbol, y, color, fontSize) {
   ctx.fillStyle = color;
   ctx.font = `${fontSize}px Arial`;
-  for (let i = 0; i <= totalTime; i += interval) {
+for (let i = 0; i <= totalTime; i += interval) {
     const x = (i / totalTime) * canvas.width;
     ctx.fillText(symbol, x - 2, y);
   }
@@ -145,7 +174,7 @@ function drawGraduationStepsHours(interval, symbol, y, color, fontSize) {
 function drawGraduationStepsMinutes(interval, symbol, y, color, fontSize) {
   ctx.fillStyle = color;
   ctx.font = `${fontSize}px Arial`;
-  for (let i = 0; i <= totalTime; i += interval) {
+for (let i = 0; i <= totalTime; i += interval) {
     if (i % 1800 !== 0) {
       const x = (i / totalTime) * canvas.width;
       ctx.fillText(symbol, x, y);
@@ -158,18 +187,18 @@ function drawGraduationStepsHalfHours(interval, height, color) {
   ctx.fillStyle = color;
   ctx.font = '8px Arial';
   for (let i = 0; i <= totalTime; i += interval) {
-    if (i % 3600) {
-      const x = (i / totalTime) * canvas.width;
-      ctx.fillRect(x - 1, 10, 3, height);
-    }
+if (i % 3600) {
+    const x = (i / totalTime) * canvas.width;
+    ctx.fillRect(x - 1, 10, 3, height);
   }
+}
 }
 
 // Function to draw time labels in timeline
 function drawTimeLabels(interval, y) {
   ctx.fillStyle = '#333';
   ctx.font = '12px Arial';
-  for (let i = 0; i <= totalTime; i += interval) {
+for (let i = 0; i <= totalTime; i += interval) {
     const x = (i / totalTime) * canvas.width;
     const formattedTime = formatTime(i);
     ctx.fillText(formattedTime, x, y);
@@ -234,7 +263,7 @@ function showTimePreview(event) {
 
   // Display the previewed time in a tooltip or any other UI element
   // For simplicity, let's log it to the console
-  console.log("Previewed Time: " + formatTime(previewedTimeInSeconds));
+  // console.log("Previewed Time: " + formatTime(previewedTimeInSeconds));
 
   // Redraw the timeline to update the preview line
   drawTimeline();
@@ -427,6 +456,6 @@ function handleMouseUp() {
   }
 }
 
-// Initial draw
-let lastTimestamp = new Date();
-drawTimeline();
+  // Initial draw
+  let lastTimestamp = new Date();
+  //drawTimeline();
