@@ -256,10 +256,21 @@ function selectTime(event) {
 function showTimePreview(event) {
   const mouseX = event.clientX;
 
+<<<<<<< HEAD
       // Calculate the previewed time and line position based on the mouse position
     const previewedTimeInSeconds = (mouseX / canvas.width) * totalTime;
     previewLineX = mouseX;
     isShowingPreviewLine = true;
+=======
+  // Calculate the previewed time and line position based on the mouse position
+  const previewedTimeInSeconds = (mouseX / canvas.width) * totalTime;
+  previewLineX = mouseX;
+  isShowingPreviewLine = true;
+
+  // Display the previewed time in a tooltip or any other UI element
+  // For simplicity, let's log it to the console
+  // console.log("Previewed Time: " + formatTime(previewedTimeInSeconds));
+>>>>>>> 26b6b4134f28147b74004dfa50e25c2c2dd7cde2
 
     // Display the previewed time in a tooltip or any other UI element
     // For simplicity, let's log it to the console
