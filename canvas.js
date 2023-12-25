@@ -30,15 +30,9 @@ const pixelsPerSecond = canvas.width / totalTime;
 
 // Animation State and Speed
 let isAnimating = false;
-let wasPlayingBeforeDrag = false;
 let currentTimeInSeconds = 0; // Starting at 00:00:00
 let indicatorHeight = 40; // Adjusted indicator height
 let animationSpeed = 1; // Default speed (1 second per frame)
-
-// Dragging Indicator Variables
-let isDragging = false;
-let dragStartX = 0;
-let isHoveringIndicator = false;
 
 // Array of Point of Interest Markers
 const pointOfInterestMarkers = [
@@ -106,7 +100,7 @@ function drawTimeline() {
   drawPreviewLine();
 
   // Continue animation if it's running
-  if (isAnimating && !isDragging) {
+  if (isAnimating) {
     requestAnimationFrame(drawTimeline);
     updateTimeline();
   }
@@ -140,8 +134,8 @@ function drawCustomIndicator(x) {
   ctx.shadowColor = shadowColor;
   ctx.shadowBlur = shadowBlur;
 
-  // Draw indicator shape with background color change on hover
-  ctx.fillStyle = isHoveringIndicator ? 'red' : indicatorColor;
+// Draw indicator shape with background color
+  ctx.fillStyle = indicatorColor;
     ctx.beginPath();
   ctx.moveTo(x, 20);
   ctx.lineTo(x, 20 + indicatorHeight);
@@ -366,13 +360,6 @@ window.addEventListener('resize', () => {
   drawTimeline();
 });
 
-// Mouse event listeners for dragging the timeline indicator
-canvas.addEventListener('mousedown', handleMouseDown);
-canvas.addEventListener('mousemove', handleMouseMove);
-canvas.addEventListener('mouseup', handleMouseUp);
-canvas.addEventListener('mouseenter', handleMouseEnter);
-canvas.addEventListener('mouseleave', handleMouseLeave);
-
 // Event listener for selecting a time when clicking on the timeline
 canvas.addEventListener('click', selectTime);
 // Event listener for clicking on the timeline to seek
@@ -394,82 +381,6 @@ function seekVideo(event) {
   // Update the video's current time
   video.currentTime = clickedTimeInSeconds;
   drawTimeline();
-}
-
-// Function to handle mouse enter for the timeline indicator
-function handleMouseEnter(event) {
-  const mouseX = event.clientX;
-  const mouseY = event.clientY;
-
-  // Check if the mouse is over the indicator
-  const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
-  const indicatorY = 20;
-  const indicatorBottomY = indicatorY + indicatorHeight;
-
-  if (mouseX >= indicatorX - 5 && mouseX <= indicatorX + 5 && mouseY >= indicatorY && mouseY <= indicatorBottomY) {
-    isHoveringIndicator = true;
-    canvas.style.cursor = 'pointer';
-  } else {
-    isHoveringIndicator = false;
-    canvas.style.cursor = 'default';
-  }
-}
-
-// Function to handle mouse leave for the timeline indicator
-function handleMouseLeave() {
-  isHoveringIndicator = false;
-  canvas.style.cursor = 'default';
-}
-
-// Function to handle mouse down for dragging the timeline indicator
-function handleMouseDown(event) {
-  const mouseX = event.clientX;
-  const mouseY = event.clientY;
-
-  // Check if the click is on the indicator
-  const indicatorX = (currentTimeInSeconds / totalTime) * canvas.width;
-  const indicatorY = 20;
-  const indicatorBottomY = indicatorY + indicatorHeight;
-
-  if (mouseX >= indicatorX - 5 && mouseX <= indicatorX + 5 && mouseY >= indicatorY && mouseY <= indicatorBottomY) {
-    isDragging = true;
-    dragStartX = event.clientX;
-    wasPlayingBeforeDrag = isAnimating;
-    if (wasPlayingBeforeDrag) {
-      isAnimating = false;
-    }
-  }
-}
-
-// Function to handle mouse move for dragging the timeline indicator
-function handleMouseMove(event) {
-  handleMouseEnter(event);
-
-  if (isDragging) {
-    const offsetX = event.clientX - dragStartX;
-    const offsetSeconds = (offsetX / canvas.width) * totalTime;
-    currentTimeInSeconds += offsetSeconds;
-
-    // Ensure the timeline indicator stays within the valid range
-    if (currentTimeInSeconds < 0) {
-      currentTimeInSeconds = 0;
-    } else if (currentTimeInSeconds > totalTime) {
-      currentTimeInSeconds = totalTime;
-    }
-
-    dragStartX = event.clientX;
-    drawTimeline();
-  }
-}
-
-// Function to handle mouse up for dragging the timeline indicator
-function handleMouseUp() {
-  isDragging = false;
-  if (wasPlayingBeforeDrag) {
-    isAnimating = true;
-    lastTimestamp = new Date();
-    requestAnimationFrame(drawTimeline);
-  }
 }
 
   // Initial draw
