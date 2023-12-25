@@ -15,7 +15,7 @@
     .canvas-wrapper {
       display: block;
       overflow: auto;
-      width: calc(100vw - 60px);
+      /* width: calc(100vw - 60px); */
       margin: auto;
     }
 
@@ -33,7 +33,7 @@
   <source src="vid1.mkv" type="video/mp4">
   Your browser does not support the video tag.
 </video>
-<div class="canvas-wrapper">
+<div class="canvas-wrapper" id="parentDiv">
   <canvas id="timeline"></canvas>
 </div>
   <button id="startButton">Start</button>

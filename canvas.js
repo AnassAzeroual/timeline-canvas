@@ -14,7 +14,7 @@ const video = document.getElementById('myVideo');
 let isShowingPreviewLine = false;
 let previewLineX = 0;
 
-canvas.width = window.innerWidth - 60;
+canvas.width = window.innerWidth;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
 // Set initial timeline duration based on the video duration after metadata is loaded
@@ -43,22 +43,35 @@ const pointOfInterestMarkers = [
 
 // Draw horizontal line based on video duration
 function drawVideoDurationLine() {
-  const lineY = canvas.height / 1.2; // Adjust the Y position of the line
-  const videoLineX = (video.duration / totalTime) * canvas.width;
+  let lineY = canvas.height / 1.2;
+  const videoLineX = (6227 / totalTime) * canvas.width;
 
-  // Create a gradient for the line
-  const gradient = ctx.createLinearGradient(0, 0, videoLineX, 0);
-  gradient.addColorStop(0, '#3498db'); // Start color
-  gradient.addColorStop(1, '#2ecc71'); // End color
+  // Iterate over an array of gradient colors
+  const gradientColors = [
+    { start: '#d334db', end: '#6e0612' },
+    { start: '#a30808', end: '#ccbc2e' },
+    { start: '#060f9a', end: '#e74c3c' }
+    // Add more gradient colors as needed
+  ];
 
-  ctx.lineWidth = 8;
-  ctx.strokeStyle = gradient; // Use the gradient for the line color
+  for (let i = 0; i < gradientColors.length; i++) {
+    const gradient = ctx.createLinearGradient(0, 0, videoLineX, 0);
+    gradient.addColorStop(0, gradientColors[i].start);
+    gradient.addColorStop(1, gradientColors[i].end);
 
-  // Draw the line
-  ctx.beginPath();
-  ctx.moveTo(0, lineY);
-  ctx.lineTo(videoLineX, lineY);
-  ctx.stroke();
+    ctx.lineWidth = 8;
+    ctx.strokeStyle = gradient;
+
+    // Calculate the X positions for the lines to appear next to each other
+    const startX = i * (videoLineX); // Adjust the spacing as needed
+    const endX = startX + videoLineX;
+
+    // Draw the line
+    ctx.beginPath();
+    ctx.moveTo(startX, lineY);
+    ctx.lineTo(endX, lineY);
+    ctx.stroke();
+  }
 }
 
 // Function to draw the timeline
@@ -355,7 +368,7 @@ normalSpeedButton.addEventListener('click', () => {
 
 // Event listener for window resize
 window.addEventListener('resize', () => {
-  canvas.width =  window.innerWidth - 60;
+  canvas.width =  window.innerWidth;
   drawTimeline();
 });
 
