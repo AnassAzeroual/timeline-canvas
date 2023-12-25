@@ -14,7 +14,7 @@ const video = document.getElementById('myVideo');
 let isShowingPreviewLine = false;
 let previewLineX = 0;
 
-canvas.width = window.innerWidth;
+canvas.width = window.innerWidth - 60;
 canvas.height = 80; // Adjusted height to accommodate the ruler
 
 // Set initial timeline duration based on the video duration after metadata is loaded
@@ -52,7 +52,6 @@ function drawVideoDurationLine() {
   gradient.addColorStop(1, '#2ecc71'); // End color
 
   ctx.lineWidth = 8;
-  ctx.lineCap = 'round'; // Add rounded line caps for a modern look
   ctx.strokeStyle = gradient; // Use the gradient for the line color
 
   // Draw the line
@@ -356,7 +355,7 @@ normalSpeedButton.addEventListener('click', () => {
 
 // Event listener for window resize
 window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
+  canvas.width =  window.innerWidth - 60;
   drawTimeline();
 });
 
