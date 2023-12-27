@@ -1,0 +1,35 @@
+<div class="wrapper">
+  <!-- <p style="display: inline-block;color: #000000;">#000000</p>
+  <p style="display: inline-block;color: #001F3F;">#001F3F</p>
+  <p style="display: inline-block;color: #228B22;">#228B22</p>
+  <p style="display: inline-block;color: #8B0000;">#8B0000</p>
+  <p style="display: inline-block;color: #FF8C00;">#FF8C00</p>
+  <p style="display: inline-block;color: #9400D3;">#9400D3</p>
+  <p style="display: inline-block;color: #008080;">#008080</p>
+  <p style="display: inline-block;color: #D2691E;">#D2691E</p>
+  <p style="display: inline-block;color: #808000;">#808000</p>
+  <p style="display: inline-block;color: #708090;">#708090</p>
+  <p style="display: inline-block;color: #4B0082;">#4B0082</p>
+  <p style="display: inline-block;color: #d41e1e;">#d41e1e</p>
+  <p style="display: inline-block;color: #A0522D;">#A0522D</p>
+  <p style="display: inline-block;color: #008B8B;">#008B8B</p>
+  <p style="display: inline-block;color: #483D8B;">#483D8B</p>
+  <p style="display: inline-block;color: #8B4513;">#8B4513</p>
+  <p style="display: inline-block;color: #556B2F;">#556B2F</p>
+  <p style="display: inline-block;color: #191970;">#191970</p>
+  <p style="display: inline-block;color: #B22222;">#B22222</p>
+  <p style="display: inline-block;color: #4682B4;">#4682B4</p> -->
+  <div class="canvas-wrapper">
+    <canvas #timelineCanvas></canvas>
+  </div>
+  <ng-container *ngIf="isAnimating; else elseTemplate">
+    <button accesskey="C" (click)="onPauseButtonClick()">Pause</button>
+  </ng-container>
+  <ng-template #elseTemplate>
+    <button accesskey="C" (click)="onStartButtonClick()">Play</button>
+  </ng-template>
+  <button accesskey="X" (click)="onStopButtonClick()">Stop</button>
+  <button (click)="onFastForwardButtonClick()">Fast Forward</button>
+  <button (click)="onSlowForwardButtonClick()">Slow Forward</button>
+  <button (click)="onNormalSpeedButtonClick()">Normal Speed</button>
+</div>
