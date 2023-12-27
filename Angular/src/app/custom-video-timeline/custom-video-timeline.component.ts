@@ -8,7 +8,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { PointOfInterest } from './classes/PointOfInterest.model';
-import { ToolsService } from './tools.service';
+import { ToolsService } from './services/tools.service';
 
 @Component({
   selector: 'custom-video-timeline',
