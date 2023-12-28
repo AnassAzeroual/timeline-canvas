@@ -3,12 +3,15 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
   OnInit,
+  Output,
   ViewChild,
 } from '@angular/core';
 import { PointOfInterest } from './classes/PointOfInterest.model';
 import { ToolsService } from './services/tools.service';
+import { VideoList } from './classes/VideoList.model';
 
 @Component({
   selector: 'custom-video-timeline',
@@ -21,10 +24,28 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   /* -------------------------------------------------------------------------- */
   /*                           @Inputs and Properties                           */
   /* -------------------------------------------------------------------------- */
-  pointOfInterestMarkers: PointOfInterest[] = [];
-  @Input('PointOfInterest') set newPointOfInterestMethod(list: PointOfInterest[]) { 
-    this.pointOfInterestMarkers = list
+  // pointOfInterestMarkers: PointOfInterest[] = [];
+  // @Input('PointOfInterest') set newPointOfInterestMethod(list: PointOfInterest[]) {
+  //   this.pointOfInterestMarkers = list
+  // }
+  showPreview: boolean = true;
+  @Input('ShowPreview') set newShowPreviewMethod(list: boolean) {
+    this.showPreview = list;
   }
+  videoList: VideoList[] = [];
+  @Input('VideoList') set newVideoListMethod(list: VideoList[]) {
+    this.videoList = list;
+  }
+  CanvasHeight: number = 120;
+  @Input('CanvasHeight') set newCanvasHeightMethod(list: number) {
+    if (list < 120) return
+    this.CanvasHeight = list;
+  }
+  /* -------------------------------------------------------------------------- */
+  /*                                  @Outputs                                  */
+  /* -------------------------------------------------------------------------- */
+  @Output('PlayPauseStop') playPauseStopEmitter = new EventEmitter<'Play' | 'Pause' | 'Stop'>();
+  @Output('Seek') seekEmitter = new EventEmitter<number>();
 
 
   @ViewChild('timelineCanvas', { static: true }) canvasRef!: ElementRef;
@@ -41,19 +62,19 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   private lineColors: string[] = [];
   public isAnimating = false;
 
-  constructor(private tools: ToolsService) {}
+  constructor(private tools: ToolsService) { }
 
   ngOnInit() {
     this.ctx = this.canvasRef.nativeElement.getContext('2d');
     this.video = document.getElementById('myVideo') as HTMLVideoElement;
 
     this.canvasRef.nativeElement.width = window.innerWidth;
-    this.canvasRef.nativeElement.height = 80;
+    this.canvasRef.nativeElement.height = this.CanvasHeight;
 
     this.video.addEventListener('loadedmetadata', () => {
       this.drawTimeline();
     });
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < this.videoList.length; i++) {
       this.lineColors.push(this.tools.randomHexColor(this.lineColors))
     }
   }
@@ -63,10 +84,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   addEventListeners() {
     window.addEventListener('resize', () => this.onWindowResize());
     this.canvasRef.nativeElement.addEventListener('click', (event: any) =>
-      this.selectTime(event)
-    );
-    this.canvasRef.nativeElement.addEventListener('click', (event: any) =>
-      this.seekVideo(event)
+      this.selectTimeAndSeekVideo(event)
     );
     this.canvasRef.nativeElement.addEventListener('mousemove', (event: any) =>
       this.showTimePreview(event)
@@ -75,24 +93,23 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.hideTimePreview()
     );
   }
-  drawVideoDurationLine() {
-    let lineY = this.canvasRef.nativeElement.height / 1.2;
-    const videoLineX = (6227 / this.totalTime) * this.canvasRef.nativeElement.width;
-  
-    for (let i = 0; i < this.lineColors.length; i++) {
-      const color = this.lineColors[i];
-  
-      this.ctx.lineWidth = 8;
-      this.ctx.strokeStyle = color;
-  
-      const startX = i * videoLineX;
-      const endX = startX + videoLineX;
-  
-      this.ctx.beginPath();
-      this.ctx.moveTo(startX, lineY);
-      this.ctx.lineTo(endX, lineY);
-      this.ctx.stroke();
-    }
+  drawVideoDurationLine(video: VideoList[], i: number) {
+    let lineY = this.canvasRef.nativeElement.height / 1.3;
+
+    console.log(video[i].durationInSeconds);
+
+
+    this.ctx.lineWidth = 12;
+    this.ctx.strokeStyle = video[i].backgroundColor;
+
+    const startX = (i===0)?0:((video[i-1].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width)+((video[i].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width);
+    const endX = (video[i].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width;
+console.log(endX);
+
+    this.ctx.beginPath();
+    this.ctx.moveTo((startX), lineY);
+    this.ctx.lineTo(endX, lineY);
+    this.ctx.stroke();
   }
 
   drawTimeline() {
@@ -103,9 +120,6 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.canvasRef.nativeElement.height
     );
 
-    const timelineHeight = 110;
-    this.canvasRef.nativeElement.height = timelineHeight;
-
     this.drawGraduationStepsHours(3600, '|', 18, '#ce1b24', 16);
     this.drawGraduationStepsHalfHours(1800, 10, '#34a853');
     this.drawGraduationStepsMinutes(300, '|', 18, '#fbbc05', 8);
@@ -115,12 +129,15 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       0,
       20,
       this.canvasRef.nativeElement.width,
-      timelineHeight - 20
+      this.canvasRef.nativeElement.height - 20
     );
 
-    this.drawVideoDurationLine();
     this.drawTimeLabels(3600, 40);
-    this.drawMarkers(this.pointOfInterestMarkers);
+    for (let i = 0; i < this.videoList.length; i++) {
+      const video = this.videoList[i];
+      this.drawVideoDurationLine(this.videoList, i);
+      this.drawMarkers(video.pointOfInterest);
+    }
 
     const indicatorX =
       (this.currentTimeInSeconds / this.totalTime) *
@@ -138,7 +155,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
 
   drawPreviewLine() {
-    if (this.isShowingPreviewLine) {
+    if (this.isShowingPreviewLine && this.showPreview) {
       // Draw the red vertical line
       this.ctx.strokeStyle = 'red';
       this.ctx.lineWidth = 1;
@@ -297,14 +314,6 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     return num < 10 ? `0${num}` : num;
   }
 
-  selectTime(event: { clientX: any }) {
-    const mouseX = event.clientX;
-    const selectedTimeInSeconds =
-      (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
-    this.currentTimeInSeconds = selectedTimeInSeconds;
-    this.drawTimeline();
-  }
-
   showTimePreview(event: { clientX: any }) {
     const mouseX = event.clientX;
     const previewedTimeInSeconds =
@@ -325,6 +334,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.isAnimating = true;
       this.lastTimestamp = new Date();
       this.drawTimeline();
+      this.playPauseStopEmitter.emit('Play');
       this.video.play();
     }
   }
@@ -334,6 +344,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.isAnimating = false;
       // this.lastTimestamp = new Date();
       this.drawTimeline();
+      this.playPauseStopEmitter.emit('Pause');
       this.video.pause();
     }
   }
@@ -343,6 +354,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.video.pause();
     this.video.currentTime = 0;
     this.currentTimeInSeconds = 0;
+    this.playPauseStopEmitter.emit('Stop');
     this.drawTimeline();
   }
 
@@ -380,12 +392,12 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.drawTimeline();
   }
 
-  seekVideo(event: { clientX: any }) {
+  selectTimeAndSeekVideo(event: { clientX: any }) {
     const mouseX = event.clientX;
-    const clickedTimeInSeconds =
-      (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
-    this.currentTimeInSeconds = clickedTimeInSeconds;
-    this.video.currentTime = clickedTimeInSeconds;
+    const timelineSelectedTimeInSeconds = (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
+    this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
+    this.video.currentTime = timelineSelectedTimeInSeconds;
+    this.seekEmitter.emit(timelineSelectedTimeInSeconds);
     this.drawTimeline();
   }
 }

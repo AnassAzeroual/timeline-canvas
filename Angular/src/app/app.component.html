@@ -1,6 +1,18 @@
 <video id="myVideo" width="640" height="360">
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+    <source src="https://mediavideo.cnrs.fr/media/visionnage/1703688473.60407700/MN03211_logo_00000000_00103202.mp4" type="video/mp4" />
     Your browser does not support the video tag.
 </video>
-<custom-video-timeline [PointOfInterest]="pointOfInterestMarkers"></custom-video-timeline>
+
+
+
+<custom-video-timeline 
+[ShowPreview]="true"
+[VideoList]="videoList"
+[CanvasHeight]="120"
+(Seek)="seekMethod($event)" 
+(PlayPauseStop)="PlayPauseStopMethod($event)"
+></custom-video-timeline>
+
+
+
 <!-- <router-outlet></router-outlet> -->

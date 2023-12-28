@@ -16,12 +16,6 @@ i = 0
       "#8B4513", "#556B2F", "#191970", "#B22222", "#4682B4"
     ];
     colors = colors.filter(v => !colorsToAvoid.includes(v))
-    console.log(colors.length);
-    
-    for (let i = colors.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [colors[i], colors[j]] = [colors[j], colors[i]];
-    }
     const randomIndex = Math.floor(Math.random() * colors.length);
 
     return colors[randomIndex];
