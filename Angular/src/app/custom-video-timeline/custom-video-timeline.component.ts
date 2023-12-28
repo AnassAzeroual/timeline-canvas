@@ -72,6 +72,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.canvasRef.nativeElement.height = this.CanvasHeight;
 
     this.video.addEventListener('loadedmetadata', () => {
+      console.log(this.video.duration);
+      
       this.drawTimeline();
     });
 
@@ -114,8 +116,11 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     let lineY = this.canvasRef.nativeElement.height / 1.3;
     this.ctx.lineWidth = 12;
     this.ctx.strokeStyle = video[i].backgroundColor;
+    let startX = 0;
+    for (let idx = 0; idx < i; idx++) {
+      startX += (video[idx].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width;
+    }
 
-    const startX = (i === 0) ? 0 : (video[i - 1].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width;
     const endX = ((video[i].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width) + startX;
 
     this.ctx.beginPath();
