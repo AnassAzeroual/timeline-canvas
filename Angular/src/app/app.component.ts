@@ -20,25 +20,25 @@ export class AppComponent {
     this.videoList = [
       new VideoList(
         'https://mediavideo.cnrs.fr/media/visionnage/1703688473.60407700/MN03211_logo_00000000_00103202.mp4',
-        (3600+3600),
+        (300),
         1,
         this.pointOfInterestMarkers,
         'orange'
       ),
       new VideoList(
         'https://mediavideo.cnrs.fr/media/visionnage/1703714974.74221000/MN01218_logo_00000000_00054005.mp4',
-        (3600+3600+3600),
+        (3600+3600+3600+3600+3600+3600),
         2,
         [],
         'red'
       ),
-      // new VideoList(
-      //   'https://mediavideo.cnrs.fr/media/visionnage/1703715409.37637700/MN02936_logo_00000000_06101614.mp4',
-      //   14500,
-      //   3,
-      //   [],
-      //   'purple'
-      // ),
+      new VideoList(
+        'https://mediavideo.cnrs.fr/media/visionnage/1703715409.37637700/MN02936_logo_00000000_06101614.mp4',
+        14500,
+        3,
+        [],
+        'purple'
+      ),
     ];
   }
 
