@@ -95,17 +95,11 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
   drawVideoDurationLine(video: VideoList[], i: number) {
     let lineY = this.canvasRef.nativeElement.height / 1.3;
-
-    console.log(video[i].durationInSeconds);
-
-
     this.ctx.lineWidth = 12;
     this.ctx.strokeStyle = video[i].backgroundColor;
 
     const startX = (i === 0) ? 0 : (video[i - 1].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width;
     const endX = ((video[i].durationInSeconds / this.totalTime) * this.canvasRef.nativeElement.width) + startX;
-
-    console.log(endX);
 
     this.ctx.beginPath();
     this.ctx.moveTo((startX), lineY);
