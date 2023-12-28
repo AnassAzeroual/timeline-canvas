@@ -56,11 +56,11 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   private isShowingPreviewLine = false;
   private previewLineX = 0;
   private totalTime = 60 * 60 * 24;
-  private currentTimeInSeconds = 0;
   private indicatorHeight = 40;
   private animationSpeed = 1;
   private lineColors: string[] = [];
   public isAnimating = false;
+  public currentTimeInSeconds = 0;
 
   constructor(private tools: ToolsService) { }
 
@@ -73,6 +73,23 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
 
     this.video.addEventListener('loadedmetadata', () => {
       this.drawTimeline();
+    });
+
+    this.video.addEventListener('timeupdate', () => {
+      this.currentTimeInSeconds = this.video.currentTime;
+      this.drawTimeline();
+    });
+
+    this.video.addEventListener('waiting', () => {
+      this.onVideoWaiting();
+    });
+  
+    this.video.addEventListener('playing', () => {
+      this.onVideoPlaying();
+    });
+  
+    this.video.addEventListener('ended', () => {
+      this.onVideoEnded();
     });
     for (let i = 0; i < this.videoList.length; i++) {
       this.lineColors.push(this.tools.randomHexColor(this.lineColors))
@@ -281,7 +298,11 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     const now = new Date();
     const elapsedMilliseconds = now.getTime() - this.lastTimestamp.getTime();
     const elapsedSeconds = elapsedMilliseconds / 1000;
-    this.currentTimeInSeconds += elapsedSeconds * this.animationSpeed;
+
+    // Update timeline only if the video is not ended
+    if (!this.video.ended) {
+      this.currentTimeInSeconds += elapsedSeconds * this.animationSpeed;
+    }
 
     if (this.currentTimeInSeconds >= this.totalTime) {
       this.currentTimeInSeconds = 0;
@@ -328,17 +349,14 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     if (!this.isAnimating) {
       this.isAnimating = true;
       this.lastTimestamp = new Date();
-      this.drawTimeline();
       this.playPauseStopEmitter.emit('Play');
       this.video.play();
     }
   }
-
+  
   onPauseButtonClick() {
     if (this.isAnimating) {
       this.isAnimating = false;
-      // this.lastTimestamp = new Date();
-      this.drawTimeline();
       this.playPauseStopEmitter.emit('Pause');
       this.video.pause();
     }
@@ -346,11 +364,36 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
 
   onStopButtonClick() {
     this.isAnimating = false;
+    this.playPauseStopEmitter.emit('Stop');
     this.video.pause();
     this.video.currentTime = 0;
     this.currentTimeInSeconds = 0;
-    this.playPauseStopEmitter.emit('Stop');
     this.drawTimeline();
+  }
+
+  onTenSecondsBackwardButtonClick() {
+    // this.isAnimating = false;
+    this.currentTimeInSeconds = this.currentTimeInSeconds - 10;
+    this.video.currentTime = this.currentTimeInSeconds;
+    this.seekEmitter.emit(this.video.currentTime);
+    if (this.isAnimating) {
+      this.lastTimestamp = new Date();
+      requestAnimationFrame(() => this.drawTimeline());
+    }
+  }
+
+  onTenSecondsForwardButtonClick() {
+    return
+    this.animationSpeed *= 4;
+    const maxSpeed = 2000;
+    if (this.animationSpeed > maxSpeed) {
+      this.animationSpeed = maxSpeed;
+    }
+
+    if (this.isAnimating) {
+      this.lastTimestamp = new Date();
+      requestAnimationFrame(() => this.drawTimeline());
+    }
   }
 
   onFastForwardButtonClick() {
@@ -386,6 +429,30 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.canvasRef.nativeElement.width = window.innerWidth;
     this.drawTimeline();
   }
+
+  onVideoWaiting() {
+    // Video is buffering, stop the animation or perform any other actions
+    this.isAnimating = false;
+    this.drawTimeline();
+  }
+  
+  onVideoPlaying() {
+    // Video is playing after buffering, resume animation or perform any other actions
+    if (!this.isAnimating) {
+      this.isAnimating = true;
+      this.lastTimestamp = new Date();
+      this.playPauseStopEmitter.emit('Play');
+      // Resume other actions as needed
+    }
+  }
+
+  onVideoEnded() {
+    this.isAnimating = false;
+    this.drawTimeline(); // Stop the animation
+    this.playPauseStopEmitter.emit('Stop');
+    // You can add any additional actions needed when the video ends
+  }
+  
 
   selectTimeAndSeekVideo(event: { clientX: any }) {
     const mouseX = event.clientX;

@@ -29,9 +29,14 @@
     <button accesskey="C" (click)="onStartButtonClick()"><i class="fas fa-play"></i></button>
   </ng-template>
   <button accesskey="X" (click)="onStopButtonClick()"><i class="fas fa-stop"></i></button>
-  <button (click)="true"><i class="fas fa-fast-backward"></i></button>
-  <button (click)="true"><i class="fas fa-fast-forward"></i></button>
+  <button (click)="onTenSecondsBackwardButtonClick()"><i class="fas fa-fast-backward"></i></button>
+  <button (click)="onTenSecondsForwardButtonClick()"><i class="fas fa-fast-forward"></i></button>
   <button (click)="onFastForwardButtonClick()">Fast Forward</button>
   <button (click)="onSlowForwardButtonClick()">Slow Forward</button>
   <button (click)="onNormalSpeedButtonClick()">Normal Speed</button>
+  <div class="spinner" *ngIf="!isAnimating && currentTimeInSeconds > 0">
+    <div class="bounce1"></div>
+    <div class="bounce2"></div>
+    <div class="bounce3"></div>
+  </div>
 </div>

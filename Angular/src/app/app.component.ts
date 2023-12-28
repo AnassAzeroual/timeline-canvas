@@ -20,7 +20,7 @@ export class AppComponent {
     this.videoList = [
       new VideoList(
         'https://mediavideo.cnrs.fr/media/visionnage/1703688473.60407700/MN03211_logo_00000000_00103202.mp4',
-        (300),
+        (600),
         1,
         this.pointOfInterestMarkers,
         'orange'
