@@ -72,7 +72,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.canvasRef.nativeElement.height = this.CanvasHeight;
 
     this.video.addEventListener('loadedmetadata', () => {
-      this.drawTimeline();
+            this.drawTimeline();
     });
 
     this.video.addEventListener('timeupdate', () => {
@@ -460,14 +460,14 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   selectTimeAndSeekVideo(event: { clientX: any }) {
     const mouseX = event.clientX;
     const timelineSelectedTimeInSeconds = (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
-console.log("timelineSelectedTimeInSeconds : ",timelineSelectedTimeInSeconds);
+    console.log("timelineSelectedTimeInSeconds : ", timelineSelectedTimeInSeconds);
 
     let accumulatedVideoDurationInSeconds = 0;
     let currentTimeInVideo = 0;
     let i = 0;
     for (const video of this.videoList) {
       i++
-      console.log('Video : ',i,' duration : ',video.durationInSeconds);
+      console.log('Video : ', i, ' duration : ', video.durationInSeconds);
       if (timelineSelectedTimeInSeconds <= accumulatedVideoDurationInSeconds + video.durationInSeconds) {
         this.video.src = video.source;
         this.video.load(); // Load the new video
@@ -476,15 +476,15 @@ console.log("timelineSelectedTimeInSeconds : ",timelineSelectedTimeInSeconds);
         this.video.currentTime = currentTimeInVideo;
         break;
       }
-      
+
       accumulatedVideoDurationInSeconds += video.durationInSeconds;
-      console.log("accumulatedVideoDurationInSeconds : ",accumulatedVideoDurationInSeconds);
-      
+      console.log("accumulatedVideoDurationInSeconds : ", accumulatedVideoDurationInSeconds);
+
     }
 
-console.log("currentTimeInVideo : ",currentTimeInVideo);
-this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
-console.log("currentTimeInSeconds : ",this.currentTimeInSeconds);
+    console.log("currentTimeInVideo : ", currentTimeInVideo);
+    this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
+    console.log("currentTimeInSeconds : ", this.currentTimeInSeconds);
 
     // Update the global time to the selected time considering accumulated duration
     this.video.play();
