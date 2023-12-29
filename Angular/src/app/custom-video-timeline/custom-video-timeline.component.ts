@@ -72,24 +72,22 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.canvasRef.nativeElement.height = this.CanvasHeight;
 
     this.video.addEventListener('loadedmetadata', () => {
-      console.log(this.video.duration);
-      
       this.drawTimeline();
     });
 
     this.video.addEventListener('timeupdate', () => {
-      this.currentTimeInSeconds = this.video.currentTime;
+      // this.currentTimeInSeconds = this.video.currentTime;
       this.drawTimeline();
     });
 
     this.video.addEventListener('waiting', () => {
       this.onVideoWaiting();
     });
-  
+
     this.video.addEventListener('playing', () => {
       this.onVideoPlaying();
     });
-  
+
     this.video.addEventListener('ended', () => {
       this.onVideoEnded();
     });
@@ -340,7 +338,6 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     const previewedTimeInSeconds =
       (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
     this.previewLineX = mouseX;
-    // console.log('Previewed Time: ' + this.formatTime(previewedTimeInSeconds));
     this.isShowingPreviewLine = true;
     this.drawTimeline();
   }
@@ -358,7 +355,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.video.play();
     }
   }
-  
+
   onPauseButtonClick() {
     if (this.isAnimating) {
       this.isAnimating = false;
@@ -370,7 +367,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   onStopButtonClick() {
     this.isAnimating = false;
     this.playPauseStopEmitter.emit('Stop');
-    this.video.pause();
+    this.video.src = this.videoList[0].source;
+    this.video.load(); // Load the new video
     this.video.currentTime = 0;
     this.currentTimeInSeconds = 0;
     this.drawTimeline();
@@ -440,7 +438,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.isAnimating = false;
     this.drawTimeline();
   }
-  
+
   onVideoPlaying() {
     // Video is playing after buffering, resume animation or perform any other actions
     if (!this.isAnimating) {
@@ -457,14 +455,49 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.playPauseStopEmitter.emit('Stop');
     // You can add any additional actions needed when the video ends
   }
-  
+
 
   selectTimeAndSeekVideo(event: { clientX: any }) {
     const mouseX = event.clientX;
     const timelineSelectedTimeInSeconds = (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
-    this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
-    this.video.currentTime = timelineSelectedTimeInSeconds;
+console.log("timelineSelectedTimeInSeconds : ",timelineSelectedTimeInSeconds);
+
+    let accumulatedVideoDurationInSeconds = 0;
+    let currentTimeInVideo = 0;
+    let i = 0;
+    for (const video of this.videoList) {
+      i++
+      console.log('Video : ',i,' duration : ',video.durationInSeconds);
+      if (timelineSelectedTimeInSeconds <= accumulatedVideoDurationInSeconds + video.durationInSeconds) {
+        this.video.src = video.source;
+        this.video.load(); // Load the new video
+
+        currentTimeInVideo = timelineSelectedTimeInSeconds;
+        this.video.currentTime = currentTimeInVideo;
+        break;
+      }
+      
+      accumulatedVideoDurationInSeconds += video.durationInSeconds;
+      console.log("accumulatedVideoDurationInSeconds : ",accumulatedVideoDurationInSeconds);
+      
+    }
+
+console.log("currentTimeInVideo : ",currentTimeInVideo);
+this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
+console.log("currentTimeInSeconds : ",this.currentTimeInSeconds);
+
+    // Update the global time to the selected time considering accumulated duration
+    this.video.play();
+
+    if (accumulatedVideoDurationInSeconds < timelineSelectedTimeInSeconds) {
+      console.log(`Seeking time exceeds the total duration of all videos.`);
+    }
+
     this.seekEmitter.emit(timelineSelectedTimeInSeconds);
     this.drawTimeline();
   }
+
+  //03:00:00 -> 02:43:47
+  // 10 800s  : 9827s
+
 }

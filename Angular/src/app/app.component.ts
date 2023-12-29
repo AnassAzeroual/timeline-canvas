@@ -43,10 +43,10 @@ export class AppComponent {
   }
 
   PlayPauseStopMethod(e: string) {
-    console.log(e);
+    // console.log(e);
   }
 
   seekMethod(e: number) {
-    console.log(e);
+    // console.log(e);
   }
 }
