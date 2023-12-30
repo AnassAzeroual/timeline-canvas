@@ -19,18 +19,18 @@ export class AppComponent {
     ];
     this.videoList = [
       new VideoList(
-        'https://mediavideo.cnrs.fr/media/visionnage/1703857124.40809200/F00434_logo_00000000_00232720.mp4',
-        1407.829333,
-        1,
-        this.pointOfInterestMarkers,
-        'black'
-      ),
-      new VideoList(
         'https://mediavideo.cnrs.fr/media/visionnage/1703857449.64990500/M03013_logo_00595901_01194501.mp4',
         1186.069333,
         2,
         [],
         'green'
+      ),
+      new VideoList(
+        'https://mediavideo.cnrs.fr/media/visionnage/1703857124.40809200/F00434_logo_00000000_00232720.mp4',
+        1407.829333,
+        1,
+        this.pointOfInterestMarkers,
+        'black'
       ),
       new VideoList(
         'https://mediavideo.cnrs.fr/media/visionnage/1703857629.46074500/MN01473_logo_00000000_00031507.mp4',

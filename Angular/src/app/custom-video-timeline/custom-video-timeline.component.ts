@@ -375,7 +375,6 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
 
   onTenSecondsBackwardButtonClick() {
-    // this.isAnimating = false;
     this.currentTimeInSeconds = this.currentTimeInSeconds - 10;
     this.video.currentTime = this.currentTimeInSeconds;
     this.seekEmitter.emit(this.video.currentTime);
@@ -386,13 +385,9 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
 
   onTenSecondsForwardButtonClick() {
-    return
-    this.animationSpeed *= 4;
-    const maxSpeed = 2000;
-    if (this.animationSpeed > maxSpeed) {
-      this.animationSpeed = maxSpeed;
-    }
-
+    this.currentTimeInSeconds = this.currentTimeInSeconds + 10;
+    this.video.currentTime = this.currentTimeInSeconds;
+    this.seekEmitter.emit(this.video.currentTime);
     if (this.isAnimating) {
       this.lastTimestamp = new Date();
       requestAnimationFrame(() => this.drawTimeline());
@@ -460,44 +455,37 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   selectTimeAndSeekVideo(event: { clientX: any }) {
     const mouseX = event.clientX;
     const timelineSelectedTimeInSeconds = (mouseX / this.canvasRef.nativeElement.width) * this.totalTime;
-    console.log("timelineSelectedTimeInSeconds : ", timelineSelectedTimeInSeconds);
 
     let accumulatedVideoDurationInSeconds = 0;
     let currentTimeInVideo = 0;
     let i = 0;
     for (const video of this.videoList) {
       i++
-      console.log('Video : ', i, ' duration : ', video.durationInSeconds);
       if (timelineSelectedTimeInSeconds <= accumulatedVideoDurationInSeconds + video.durationInSeconds) {
         this.video.src = video.source;
         this.video.load(); // Load the new video
-
-        currentTimeInVideo = timelineSelectedTimeInSeconds;
-        this.video.currentTime = currentTimeInVideo;
         break;
       }
-
       accumulatedVideoDurationInSeconds += video.durationInSeconds;
-      console.log("accumulatedVideoDurationInSeconds : ", accumulatedVideoDurationInSeconds);
-
     }
-
-    console.log("currentTimeInVideo : ", currentTimeInVideo);
+    // this.video.muted = true;
+    currentTimeInVideo = timelineSelectedTimeInSeconds;
+    console.log('currentTimeInVideo : ',(currentTimeInVideo-accumulatedVideoDurationInSeconds)/60);
+    
+    this.video.currentTime = currentTimeInVideo-accumulatedVideoDurationInSeconds;
     this.currentTimeInSeconds = timelineSelectedTimeInSeconds;
-    console.log("currentTimeInSeconds : ", this.currentTimeInSeconds);
 
     // Update the global time to the selected time considering accumulated duration
-    this.video.play();
+    if (this.isAnimating) {
+      this.video.play();
+    }
 
     if (accumulatedVideoDurationInSeconds < timelineSelectedTimeInSeconds) {
-      console.log(`Seeking time exceeds the total duration of all videos.`);
+      console.info(`Seeking time exceeds the total duration of all videos.`);
     }
 
     this.seekEmitter.emit(timelineSelectedTimeInSeconds);
     this.drawTimeline();
   }
-
-  //03:00:00 -> 02:43:47
-  // 10 800s  : 9827s
 
 }
