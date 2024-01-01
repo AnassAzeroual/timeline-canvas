@@ -57,8 +57,6 @@ export class ToolsService {
   }
 
   calculateXPositionOnTimeline(timeInSeconds: number): number {
-    console.log('calculateXPositionOnTimeline');
-    
     return (timeInSeconds / this.getContext().totalTimelineInSeconds) * this.getContext().canvasWidth;
   }
   
@@ -68,7 +66,6 @@ export class ToolsService {
   /* -------------------------------------------------------------------------- */
   setContext(key: ContextKeys = 'default', value: any = null) {
     this.context[key] = value;
-    this.memoryAdd('context', this.context);
   }
   getContext() {
     return this.context;
@@ -76,14 +73,6 @@ export class ToolsService {
 
   findInContext(key: ContextKeys) {
     return this.context[key];
-  }
-
-  memoryAdd(name: string, value: any) {
-    localStorage.setItem(name, JSON.stringify(value));
-  }
-
-  memoryRead(name: string) {
-    return JSON.parse(localStorage.getItem(name) as string) ?? [];
   }
 
 }
