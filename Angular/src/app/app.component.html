@@ -1,11 +1,11 @@
 <video id="myVideo" width="640" height="360" controls>
-    <source src="https://mediavideo.cnrs.fr/media/visionnage/1703857449.64990500/M03013_logo_00595901_01194501.mp4" type="video/mp4" />
+    <source src="" type="video/mp4" />
     Your browser does not support the video tag.
 </video>
 
 
 
-<custom-video-timeline 
+<custom-video-timeline *ngIf="videoList.length"
 [ShowPreview]="true"
 [VideoList]="videoList"
 [CanvasHeight]="120"
