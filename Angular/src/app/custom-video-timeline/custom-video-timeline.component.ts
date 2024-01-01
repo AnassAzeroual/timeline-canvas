@@ -81,8 +81,10 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       this.video.load()
       this.video.muted = true;
     }
-    this.canvasRef.nativeElement.width = window.innerWidth;
-    this.canvasRef.nativeElement.height = this.CanvasHeight;
+    this.helper.setContext('canvasWidth',window.innerWidth);
+    this.helper.setContext('canvasHeight',this.CanvasHeight);
+    this.canvasRef.nativeElement.width = this.helper.getContext().canvasWidth;
+    this.canvasRef.nativeElement.height = this.helper.getContext().canvasHeight;
   }
   ngAfterViewInit(): void {
     this.addEventListeners();
@@ -263,7 +265,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.ctx.fillStyle = color;
     this.ctx.font = `${fontSize}px Arial`;
     for (let i = 0; i <= this.TIMELINE_TOTAL_TIME_SECONDES; i += interval) {
-      const x = (i / this.TIMELINE_TOTAL_TIME_SECONDES) * this.canvasRef.nativeElement.width;
+      const x = this.helper.calculateXPositionOnTimeline(i);
       this.ctx.fillText(symbol, x - 2, y);
     }
   }
@@ -279,7 +281,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.ctx.font = `${fontSize}px Arial`;
     for (let i = 0; i <= this.TIMELINE_TOTAL_TIME_SECONDES; i += interval) {
       if (i % 1800 !== 0) {
-        const x = (i / this.TIMELINE_TOTAL_TIME_SECONDES) * this.canvasRef.nativeElement.width;
+        const x = this.helper.calculateXPositionOnTimeline(i);
         this.ctx.fillText(symbol, x, y);
       }
     }
@@ -294,7 +296,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.ctx.font = '8px Arial';
     for (let i = 0; i <= this.TIMELINE_TOTAL_TIME_SECONDES; i += interval) {
       if (i % 3600) {
-        const x = (i / this.TIMELINE_TOTAL_TIME_SECONDES) * this.canvasRef.nativeElement.width;
+        const x = this.helper.calculateXPositionOnTimeline(i);
         this.ctx.fillRect(x - 1, 10, 3, height);
       }
     }
@@ -304,7 +306,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.ctx.fillStyle = '#333';
     this.ctx.font = '12px Arial';
     for (let i = 0; i <= this.TIMELINE_TOTAL_TIME_SECONDES; i += interval) {
-      const x = (i / this.TIMELINE_TOTAL_TIME_SECONDES) * this.canvasRef.nativeElement.width;
+      const x = this.helper.calculateXPositionOnTimeline(i);
       const formattedTime = this.formatTime(i);
       this.ctx.fillText(formattedTime, x, y);
     }
@@ -438,7 +440,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
 
   onWindowResize() {
-    this.canvasRef.nativeElement.width = window.innerWidth;
+    this.helper.setContext('canvasWidth',window.innerWidth);
+    this.canvasRef.nativeElement.width = this.helper.getContext().canvasWidth;
     this.drawTimeline();
   }
 

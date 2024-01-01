@@ -9,6 +9,10 @@ export class ToolsService {
   context: Context = new Context();
   constructor() { }
 
+  /* -------------------------------------------------------------------------- */
+  /*                                   Helpers                                  */
+  /* -------------------------------------------------------------------------- */
+
   randomHexColor(colorsToAvoid: string[] = []) {
     let colors: string[] = [
       "#000000", "#001F3F", "#228B22", "#8B0000", "#FF8C00",
@@ -52,6 +56,16 @@ export class ToolsService {
     });
   }
 
+  calculateXPositionOnTimeline(timeInSeconds: number): number {
+    console.log('calculateXPositionOnTimeline');
+    
+    return (timeInSeconds / this.getContext().totalTimelineInSeconds) * this.getContext().canvasWidth;
+  }
+  
+
+  /* -------------------------------------------------------------------------- */
+  /*                               Context Methods                              */
+  /* -------------------------------------------------------------------------- */
   setContext(key: ContextKeys = 'default', value: any = null) {
     this.context[key] = value;
     this.memoryAdd('context', this.context);
