@@ -59,7 +59,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   private ctx!: CanvasRenderingContext2D;
   private video!: HTMLVideoElement;
 
-  private lastTimestamp = new Date();
+    private lastTimestamp = new Date();
   private isShowingPreviewLine = false;
   private previewLineX = 0;
   private TIMELINE_TOTAL_TIME_SECONDES = 60 * 60 * 24;
@@ -85,6 +85,10 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.helper.setContext('canvasHeight',this.CanvasHeight);
     this.canvasRef.nativeElement.width = this.helper.getContext().canvasWidth;
     this.canvasRef.nativeElement.height = this.helper.getContext().canvasHeight;
+    this.drawGraduationSteps();
+    for (const video of this.helper.getContext().allVideos) {
+      this.drawMarkers(video.pointOfInterest);
+    }
   }
   ngAfterViewInit(): void {
     this.addEventListeners();
@@ -146,12 +150,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
       0,
       0,
       this.canvasRef.nativeElement.width,
-      this.canvasRef.nativeElement.height
+      this.canvasRef.nativeElement.height - 200
     );
-
-    this.drawGraduationStepsHours(3600, '|', 18, '#ce1b24', 16);
-    this.drawGraduationStepsHalfHours(1800, 10, '#34a853');
-    this.drawGraduationStepsMinutes(300, '|', 18, '#fbbc05', 8);
 
     this.ctx.fillStyle = '#f0f0f0';
     this.ctx.fillRect(
@@ -166,7 +166,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     for (let i = 0; i < tempVideoList.length; i++) {
       const video = tempVideoList[i];
       this.drawVideoDurationLine(tempVideoList, i);
-      this.drawMarkers(video.pointOfInterest);
+      
     }
 
     const indicatorX =
@@ -182,6 +182,14 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
         this.updateTimeline();
       });
     }
+  }
+
+  private drawGraduationSteps() {
+    console.log('is enter');
+    
+    this.drawGraduationStepsHours(3600, '|', 18, '#ce1b24', 16);
+    this.drawGraduationStepsHalfHours(1800, 10, '#34a853');
+    this.drawGraduationStepsMinutes(300, '|', 18, '#fbbc05', 8);
   }
 
   drawPreviewLine() {
@@ -209,6 +217,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     }
   }
   drawMarkers(markers: PointOfInterest[]) {
+    console.log('markers');
+    
     markers.forEach(
       (marker: PointOfInterest) => {
         const markerX =
@@ -231,8 +241,8 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     const indicatorColor = '#4CAF50';
     const shadowColor = 'rgba(0, 0, 0, 0.3)';
     const shadowBlur = 5;
-
-    this.ctx.shadowColor = shadowColor;
+    
+        this.ctx.shadowColor = shadowColor;
     this.ctx.shadowBlur = shadowBlur;
 
     this.ctx.fillStyle = indicatorColor;
@@ -253,7 +263,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.ctx.fillStyle = '#000';
     this.ctx.textAlign = 'start';
     this.ctx.fillText(currentTimeFormatted, x, 20 + this.indicatorHeight + 15);
-  }
+}
 
   drawGraduationStepsHours(
     interval: number,
@@ -442,6 +452,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   onWindowResize() {
     this.helper.setContext('canvasWidth',window.innerWidth);
     this.canvasRef.nativeElement.width = this.helper.getContext().canvasWidth;
+    this.drawGraduationSteps()
     this.drawTimeline();
   }
 
