@@ -66,7 +66,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   private indicatorHeight = 40;
   private animationSpeed = 1;
   public isAnimating = false;
-  public currentTimeInSeconds = 0;
+  public currentTimeInSeconds = 3600;
 
   constructor(private helper: ToolsService) { 
     console.log(helper.context);
@@ -85,9 +85,22 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     this.helper.setContext('canvasHeight',this.CanvasHeight);
     this.canvasRef.nativeElement.width = this.helper.getContext().canvasWidth;
     this.canvasRef.nativeElement.height = this.helper.getContext().canvasHeight;
-    this.drawGraduationSteps();
-    for (const video of this.helper.getContext().allVideos) {
+    this.ctx.fillStyle = '#f0f0f0';
+    this.ctx.fillRect(
+      0,
+      20,
+      this.canvasRef.nativeElement.width,
+      this.canvasRef.nativeElement.height,
+      );
+      this.drawGraduationSteps();
+      for (const video of this.helper.getContext().allVideos) {
       this.drawMarkers(video.pointOfInterest);
+    }
+    this.drawTimeLabels(3600, 40);
+    const tempVideoList = this.helper.getContext().allVideos;
+    for (let i = 0; i < tempVideoList.length; i++) {
+      const video = tempVideoList[i];
+      this.drawVideoDurationLine(tempVideoList, i);
     }
   }
   ngAfterViewInit(): void {
@@ -129,7 +142,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     });
   }
   drawVideoDurationLine(video: VideoList[], i: number) {
-    let lineY = this.canvasRef.nativeElement.height / 1.3;
+    let lineY = this.canvasRef.nativeElement.height / 1.1;
     this.ctx.lineWidth = 12;
     this.ctx.strokeStyle = video[i].backgroundColor;
     let startX = 0;
@@ -146,28 +159,21 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
   }
 
   drawTimeline() {
+    const y = 39;
     this.ctx.clearRect(
       0,
-      0,
+      y,
       this.canvasRef.nativeElement.width,
-      this.canvasRef.nativeElement.height - 200
+      50
     );
 
     this.ctx.fillStyle = '#f0f0f0';
     this.ctx.fillRect(
       0,
-      20,
+      y,
       this.canvasRef.nativeElement.width,
-      this.canvasRef.nativeElement.height - 20
+      50
     );
-
-    this.drawTimeLabels(3600, 40);
-    const tempVideoList = this.helper.getContext().allVideos;
-    for (let i = 0; i < tempVideoList.length; i++) {
-      const video = tempVideoList[i];
-      this.drawVideoDurationLine(tempVideoList, i);
-      
-    }
 
     const indicatorX =
       (this.currentTimeInSeconds / this.TIMELINE_TOTAL_TIME_SECONDES) *
@@ -247,9 +253,9 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
 
     this.ctx.fillStyle = indicatorColor;
     this.ctx.beginPath();
-    this.ctx.moveTo(x, 20);
-    this.ctx.lineTo(x, 20 + this.indicatorHeight);
-    this.ctx.arc(x, 20 + this.indicatorHeight, 5, 0, Math.PI * 2);
+    this.ctx.moveTo(x, 40);
+    this.ctx.lineTo(x, 40 + this.indicatorHeight);
+    this.ctx.arc(x, 40 + this.indicatorHeight, 5, 0, Math.PI * 2);
     this.ctx.closePath();
     this.ctx.fill();
 
@@ -262,7 +268,7 @@ export class CustomVideoTimelineComponent implements OnInit, AfterViewInit {
     );
     this.ctx.fillStyle = '#000';
     this.ctx.textAlign = 'start';
-    this.ctx.fillText(currentTimeFormatted, x, 20 + this.indicatorHeight + 15);
+    this.ctx.fillText(currentTimeFormatted, x+10, 15 + this.indicatorHeight + 15);
 }
 
   drawGraduationStepsHours(
